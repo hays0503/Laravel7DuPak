@@ -25,6 +25,10 @@ Route::name('user.')->group(function () {
 
     Route::get('/registration', 'RegistrationController@showRegistrationForm')->name('registration');
     Route::post('/registration', 'RegistrationController@save');
+
+    Route::get('/rooms',function (){
+        return view('rooms');
+    });
 });
 
 Route::get('/game', function () {
