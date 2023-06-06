@@ -1,7 +1,3 @@
-@php
-    $users = \App\User::all();
-@endphp
-
 <!DOCTYPE html>
 <html lang="en">
 @include('header')
@@ -45,6 +41,10 @@
                                     <div class="form-group">
                                         <label>Участники игры</label>
                                         <select multiple class="custom-select">
+                                            @php
+                                                $userController = app(\App\Http\Controllers\UserController::class);
+                                                $users = $userController->getUsers();
+                                            @endphp
                                             @foreach ($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                                             @endforeach

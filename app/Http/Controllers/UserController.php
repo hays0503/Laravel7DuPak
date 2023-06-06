@@ -19,10 +19,10 @@ class UserController extends Controller
 //     return view('user.index', ['users' => $users]);
 //   }
 
-  public function getUsers()
-  {
+public function getUsers()
+{
     $users = User::all();
 
-    return view('rooms', ['users' => $users]);
-  }  
+    return $users;
+}
 }
