@@ -20,46 +20,56 @@
                 </div>
 
 
-                <!-- Modal для создание комнаты -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
-                    aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Создание комнаты для игры</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form>
-                                    <div class="form-group">
-                                        <label for="name">Название комнаты</label>
-                                        <input type="name" class="form-control" id="name"
-                                            placeholder="Комната:1">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Участники игры</label>
-                                        <select multiple class="custom-select">
-                                            @php
-                                                $userController = app(\App\Http\Controllers\UserController::class);
-                                                $users = $userController->getUsers();
-                                            @endphp
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                            @endforeach
-
-                                        </select>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
-                                <button type="button" class="btn btn-primary">Сохранить</button>
-                            </div>
-                        </div>
+<!-- Modal для создания комнаты -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Создание комнаты для игры</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('rooms.store') }}" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label for="name">Название комнаты</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                            value="Комната:{{ $lastRoomId + 1 }}">
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label>Участники игры</label>
+                        <select multiple class="custom-select" name="users[]">
+                            @foreach ($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#exampleModal').on('shown.bs.modal', function() {
+            var lastRoomId = {{ $lastRoomId }};
+            var nextRoomId = lastRoomId + 1;
+            $('#name').val('Комната:' + nextRoomId);
+        });
+    });
+</script>
+
+
+
+
             </div>
             <div class="table-responsive  table-hover">
                 <table class="table table-striped table-sm">
@@ -75,37 +85,86 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th>1</th>
-                            <td>Комната 1</td>
-                            <td>Участники 1,Участники 2, Участники 3</td>
-                            <td>05.05.05</td>
-                            <td>
-                                <button class="btn btn-warning">Изменить</button>
-                                <button class="btn btn-danger">Удалить</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>2</th>
-                            <td>Комната 2</td>
-                            <td>Участники 4,Участники 5, Участники 6</td>
-                            <td>05.05.05</td>
-                            <td>
-                                <button class="btn btn-warning">Изменить</button>
-                                <button class="btn btn-danger">Удалить</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>3</th>
-                            <td>Комната 3</td>
-                            <td>Участники 7,Участники 8, Участники 9</td>
-                            <td>05.05.05</td>
-                            <td>
-                                <button class="btn btn-warning">Изменить</button>
-                                <button class="btn btn-danger">Удалить</button>
-                            </td>
-                        </tr>
+                        @foreach ($rooms as $room)
+                            <tr>
+                                <td>{{ $room->id }}</td>
+                                <td>{{ $room->name }}</td>
+                                <td>
+                                    @foreach ($room->users as $user)
+                                        {{ $user->name }},
+                                    @endforeach
+                                </td>
+                                <td>{{ $room->create_data }}</td>
+                                <td>
+                                    <button class="btn btn-warning edit-room-btn" data-toggle="modal"
+                                        data-target="#editRoomModal" data-room-id="{{ $room->id }}"
+                                        data-room-name="{{ $room->name }}">Изменить</button>
+
+                                    <form action="{{ route('rooms.destroy', ['id' => $room->id]) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Удалить</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+
                     </tbody>
+
+                    <!-- Модальное окно для редактирования комнаты -->
+                    <div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog"
+                        aria-labelledby="editRoomModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editRoomModalLabel">Изменить комнату</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form id="editRoomForm" action="" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="roomName">Название комнаты</label>
+                                            <input type="text" class="form-control" id="roomName" name="name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="roomUsers">Участники игры</label>
+                                            <select multiple class="custom-select" id="roomUsers" name="users[]"
+                                                size="5">
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Отмена</button>
+                                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        $(document).ready(function() {
+                            $('.edit-room-btn').click(function() {
+                                var roomId = $(this).data('room-id');
+                                var roomName = $(this).data('room-name');
+                                $('#editRoomModalLabel').text('Изменить комнату: ' + roomName);
+                                $('#roomName').val(roomName);
+                                $('#editRoomForm').attr('action', '/rooms/' + roomId);
+                                $('#editRoomModal').modal('show');
+                            });
+                        });
+                    </script>
+
+
                 </table>
             </div>
         </div>

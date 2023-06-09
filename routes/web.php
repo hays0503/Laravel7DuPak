@@ -26,10 +26,18 @@ Route::name('user.')->group(function () {
     Route::get('/registration', 'RegistrationController@showRegistrationForm')->name('registration');
     Route::post('/registration', 'RegistrationController@save');
 
-    Route::get('/rooms',function (){
-        return view('rooms');
-    });
+
 });
+
+Route::get('/rooms', 'RoomController@getRooms')->name('rooms');
+
+Route::put('/rooms/{id}', 'RoomController@update')->name('rooms.update');
+
+Route::delete('/rooms/{id}', 'RoomController@destroy')->name('rooms.destroy');
+
+Route::get('/rooms/create', 'RoomController@create')->name('rooms.create');
+
+Route::post('/rooms', 'RoomController@store')->name('rooms.store');
 
 Route::get('/game', function () {
     return view('welcome');
