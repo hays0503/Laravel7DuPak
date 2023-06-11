@@ -19,6 +19,16 @@ class Room extends Model
 
     public function games()
     {
-        return $this->hasMany(Game::class);
+        return $this->hasMany(Games::class);
+    }
+
+
+
+    public function create($name)
+    {
+        $this->name = $name;
+        $this->create_data = now();
+        $this->save();
+        return $this;
     }
 }

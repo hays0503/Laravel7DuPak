@@ -4,14 +4,18 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Game extends Model
+class Games extends Model
 {
     protected $fillable = ['name'];
 
-    public function createGame($name)
-    {
-        $game = $this->create(['name' => $name]);
 
+    public function create($room_id)
+    {
+        $game = $this->create(
+            ['data' => now()],
+            ['winner_id' => null],
+            ['room_id' => $room_id]
+        );
         // Дополнительная логика создания игры
 
         return $game;

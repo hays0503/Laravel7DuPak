@@ -39,6 +39,10 @@ Route::get('/rooms/create', 'RoomController@create')->name('rooms.create');
 
 Route::post('/rooms', 'RoomController@store')->name('rooms.store');
 
+Route::post('/chat/{id}/send-message', 'ChatController@sendMessage')->name('chat.send-message');
+Route::get('/chat/{id}/get-messages', 'ChatController@getMessages')->name('chat.get-messages');
+
+
 Route::get('/game', function () {
     return view('welcome');
 });

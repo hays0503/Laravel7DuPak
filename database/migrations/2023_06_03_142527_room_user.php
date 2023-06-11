@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +15,8 @@ class RoomUser extends Migration
         Schema::create('room_user', function (Blueprint $table) {
             $table->id();            
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('game_id')->constrained('rooms');
+            $table->foreignId('game_id')->constrained('rooms', 'id');
+            // $table->unsignedBigInteger('room_id')->nullable();
         });
     }
 
