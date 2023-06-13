@@ -22,6 +22,11 @@ class Room extends Model
         return $this->hasMany(Games::class);
     }
 
+    public function getRoomById($id)
+    {
+        return $this->where('id', $id)->first();
+    }
+
 
 
     public function create($name)

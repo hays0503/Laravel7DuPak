@@ -7,10 +7,12 @@ use App\Room;
 use App\User;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
+use App\RoomUser;
 
 class RoomController extends Controller
 {
-    public function getRooms()
+    //Все комнаты
+    public function getRoomsView()
     {
         $rooms = Room::all();
         $users = User::all();
@@ -18,6 +20,20 @@ class RoomController extends Controller
 
         return view('rooms', compact('rooms', 'users', 'lastRoomId'));
     }
+
+    //Комната по id
+    public function getRoom($Id)
+    {
+        // Возвращаем пользователей которые в комнате
+        // Возвращаем название комнаты
+
+        $room = Room::find($Id);
+        $users = RoomUser::getUsersByGameId($Id);
+
+        return view('Room', compact('room', 'users'));
+    }
+
+
 
     public function update(Request $request, $id)
     {

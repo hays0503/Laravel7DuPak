@@ -29,7 +29,9 @@ Route::name('user.')->group(function () {
 
 });
 
-Route::get('/rooms', 'RoomController@getRooms')->name('rooms');
+
+
+Route::get('/rooms', 'RoomController@getRoomsView')->name('rooms');
 
 Route::put('/rooms/{id}', 'RoomController@update')->name('rooms.update');
 
@@ -38,6 +40,10 @@ Route::delete('/rooms/{id}', 'RoomController@destroy')->name('rooms.destroy');
 Route::get('/rooms/create', 'RoomController@create')->name('rooms.create');
 
 Route::post('/rooms', 'RoomController@store')->name('rooms.store');
+
+Route::get('/rooms/room/{id}', 'RoomController@getRoom')->name('rooms.room');
+
+Route::get('/rooms/room/{id}/gameRoom/', 'GameController@GameRoom')->name('GameRoom');
 
 Route::post('/chat/{id}/send-message', 'ChatController@sendMessage')->name('chat.send-message');
 Route::get('/chat/{id}/get-messages', 'ChatController@getMessages')->name('chat.get-messages');
