@@ -13,9 +13,10 @@ class RoomUser extends Migration
     public function up()
     {
         Schema::create('room_user', function (Blueprint $table) {
-            $table->id();            
+            $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('game_id')->constrained('rooms', 'id');
+            $table->boolean('is_ready')->default(false);
             // $table->unsignedBigInteger('room_id')->nullable();
         });
     }

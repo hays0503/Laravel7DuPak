@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
         $user->name = $name;
         $user->email = $email;
         $user->email_verified_at = now();
-        $user->password = password_hash($password,'bcrypt');
+        $user->password = bcrypt($password);
         $user->save();
 
     }

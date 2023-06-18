@@ -33,6 +33,28 @@ class RoomController extends Controller
         return view('Room', compact('room', 'users'));
     }
 
+    //Изменение состояния пользователя (is_ready) в конкретной комнате
+    public function updateStateUser(Request $request)
+    {
+        $roomId = $request->route('id');
+        error_log($roomId);
+        $user_id = $request->input('user_id');
+        error_log($user_id);
+        $isReady = $request->input('is_ready');
+        error_log($isReady);
+        //Берем запись из таблицы room_user по id пользователя и id комнаты
+        $roomUser = RoomUser::where('user_id', $user_id)->where('game_id', $roomId)->first();
+
+        $roomUser->is_ready = $isReady;
+        $roomUser->save();
+
+        return response()->json([
+            'success' => true,
+            'user_in_room' => $roomUser
+        ]);
+    }
+
+
 
 
     public function update(Request $request, $id)

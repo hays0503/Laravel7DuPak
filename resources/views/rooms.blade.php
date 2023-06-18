@@ -82,9 +82,13 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    {{-- Использую id для того что бы повесить обработчик на таблицу --}}
+                    <tbody id="rooms-list">
                         @foreach ($rooms as $room)
+                            {{-- На строки вешаем обработчик нажатие --}}
+                            {{-- По клику заходим в комнату --}}
                             <tr>
+                                {{-- Комнату берем по id --}}
                                 <td>{{ $room->id }}</td>
                                 <td>{{ $room->name }}</td>
                                 <td>
@@ -159,6 +163,15 @@
                                 $('#editRoomForm').attr('action', '/rooms/' + roomId);
                                 $('#editRoomModal').modal('show');
                             });
+                        });
+
+                        // По клику на строку таблицы переходим в комнату
+                        $('#rooms-list tr').click(function() {
+                            // Получаем id комнаты
+                            const roomId = $(this).children('td:first').text();
+                            // Переходим в комнату
+                            // url: /rooms/room/{id}
+                            window.location.href = '/rooms/room/' + roomId;
                         });
                     </script>
 

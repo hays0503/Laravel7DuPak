@@ -43,6 +43,8 @@ Route::post('/rooms', 'RoomController@store')->name('rooms.store');
 
 Route::get('/rooms/room/{id}', 'RoomController@getRoom')->name('rooms.room');
 
+Route::post('/rooms/room/{id}/update-state-user', 'RoomController@updateStateUser')->name('rooms.update-state-user');
+
 Route::get('/rooms/room/{id}/gameRoom/', 'GameController@GameRoom')->name('GameRoom');
 
 Route::post('/chat/{id}/send-message', 'ChatController@sendMessage')->name('chat.send-message');

@@ -51,6 +51,7 @@ class RoomUser extends Model
     {
         $this->user_id = $user_id;
         $this->game_id = $game_id;
+        $this->is_ready = false;
         $this->save();
     }
 
