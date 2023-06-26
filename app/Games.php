@@ -9,11 +9,12 @@ class Games extends Model
     protected $fillable = ['name'];
 
 
-    public function create($room_id)
+    public function create($winner_id,$creator_id,$room_id)
     {
         $game = $this->create(
             ['data' => now()],
-            ['winner_id' => null],
+            ['winner_id' => $winner_id],
+            ['creator_id' => $creator_id],
             ['room_id' => $room_id]
         );
         // Дополнительная логика создания игры

@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 
+use App\Games;
+
 class createAnyGames extends Seeder
 {
     /**
@@ -9,11 +11,12 @@ class createAnyGames extends Seeder
      *
      * @return void
      */
-    public function create($room_id)
+    public function create($winner_id, $creator_id, $room_id)
     {
         //Шаг#2. Создает игру
-        $AppGames = new App\Games;
-        $AppGames->create($room_id->id);
+        $AppGames = new Games;
+        $AppGames->create($winner_id->id, $creator_id->id, $room_id->id);
+        $AppGames->save();
     }
 
 
@@ -21,12 +24,7 @@ class createAnyGames extends Seeder
     public function run()
     {
         //Шаг#2. Создает игру #1
-        $this->create(1);
+        $this->create(1,1,1);
 
-        //Шаг#2. Создает игру #2
-        $this->create(2);
-
-        //Шаг#2. Создает игру #3
-        $this->create(3);
     }
 }

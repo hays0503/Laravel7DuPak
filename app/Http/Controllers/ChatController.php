@@ -30,7 +30,10 @@ class ChatController extends Controller
         $ModelMessages = new GameChat;
         $roomId = $request->route('id');
         $Messages = $ModelMessages->messageInRoom($roomId);
-        return $Messages;
+        // Возвращаем сообщения в формате JSON
+        return response()->json([
+            'messages' => $Messages
+        ], 200);
     }
 
 }

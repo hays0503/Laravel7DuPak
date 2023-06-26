@@ -28,9 +28,21 @@ class RoomController extends Controller
         // Возвращаем название комнаты
 
         $room = Room::find($Id);
+        // Текущий пользователь
+        $user = auth()->user();
+        //Пользователи в комнате
         $users = RoomUser::getUsersByGameId($Id);
 
-        return view('Room', compact('room', 'users'));
+        // Проверяем есть ли возможность человека зайти в комнату
+        // Если нет, то редиректим на страницу с комнатами
+        if ($room->users->contains($user)) {
+            return view('Room', compact('room', 'users'));
+        } else {
+            // Отправляем сообщение об ошибке 'access-denied-in-room'
+            return redirect(route('rooms'))->withErrors([
+                'access-denied-in-room' => 'Нет доступа к комнате',
+            ]);
+        }
     }
 
     //Изменение состояния пользователя (is_ready) в конкретной комнате
@@ -52,6 +64,29 @@ class RoomController extends Controller
             'success' => true,
             'user_in_room' => $roomUser
         ]);
+    }
+
+    //Запрос состояния пользователей (is_ready) в конкретной комнате
+    public function getStateUser(Request $request)
+    {
+        $roomId = $request->route('id');
+        error_log($roomId);
+        $user_id = $request->input('user_id');
+        //Проверяем есть ли запись в таблице room_user по id пользователя и id комнаты
+        //(Состоит ли пользователь в комнате)
+        $user_in_room = RoomUser::where('user_id', $user_id)->where('game_id', $roomId)->first();
+        $roomsUser = RoomUser::where('game_id', $roomId)->get();
+        if ($user_in_room == null) {
+            //Status 403 - Forbidden
+            return response()->json([
+                'success' => false
+            ], 403);
+        } else {
+            return response()->json([
+                'success' => true,
+                'user_in_room' => $roomsUser
+            ], 200);
+        }
     }
 
 

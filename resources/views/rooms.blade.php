@@ -20,6 +20,22 @@
                 </div>
 
 
+
+                @error('access-denied-in-room')
+                    <!-- Showing alert -->
+                    <div id="alert" class="alert alert-danger">
+                        {{ $message }}
+                    </div>
+
+                    <script type="text/javascript">
+                        setTimeout(function() {
+
+                            // Closing the alert
+                            $('#alert').alert('close');
+                        }, 5000);
+                    </script>
+                @enderror
+
                 <!-- Modal для создания комнаты -->
                 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
                     aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -165,8 +181,11 @@
                             });
                         });
 
-                        // По клику на строку таблицы переходим в комнату
-                        $('#rooms-list tr').click(function() {
+                        // По двойному клику на строку таблицы переходим в комнату
+
+
+
+                        $('#rooms-list tr').dblclick(function() {
                             // Получаем id комнаты
                             const roomId = $(this).children('td:first').text();
                             // Переходим в комнату

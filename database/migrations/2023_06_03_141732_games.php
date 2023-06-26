@@ -17,6 +17,7 @@ class Games extends Migration
             $table->id();
             $table->string('data');
             $table->foreignId('room_id')->constrained('rooms');
+            $table->foreignId('creator_id')->constrained('users');
             $table->foreignId('winner_id')->constrained('users');
             $table->timestamps();
         });
