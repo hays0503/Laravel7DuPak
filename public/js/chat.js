@@ -25,7 +25,7 @@ const observer = new ResizeObserver(function (entries) {
 // Начинаем отслеживать изменения размеров элемента(для прокрутки в самый конец сообщений)
 observer.observe(document.getElementById("chat-history"));
 
-function send_message_user(user_id, csrf_token,url_send_message) {
+function send_message_user(user_id, csrf_token, url_send_message) {
     let messageData = $("#message").val();
     console.log(messageData);
     if (messageData.length > 0) {
@@ -50,7 +50,7 @@ function send_message_user(user_id, csrf_token,url_send_message) {
 /* Раз в 5 секунд опрашиваем сервер на новые сообщение */
 /* Обрабочка получение сообщений с сервера и добавление их.*/
 
-function update_chat_history(userjson,url_get_messages) {
+function update_chat_history(userjson, url_get_messages) {
     $.ajax({
         url: url_get_messages,
         type: "GET",
@@ -113,9 +113,6 @@ function update_chat_history(userjson,url_get_messages) {
                     let messages = document.getElementById("chat-history");
 
                     messages.append(messageBlock);
-
-                    /* Добавляем скролл в самый низ */
-                    messages.scrollTop = messages.scrollHeight;
                 });
             }
         },
@@ -126,7 +123,12 @@ function update_chat_history(userjson,url_get_messages) {
 }
 
 /* Обработка изменения статуса готовности игрока */
-function set_state_user_ready(user_id, csrf_token, is_ready,url_update_state_user) {
+function set_state_user_ready(
+    user_id,
+    csrf_token,
+    is_ready,
+    url_update_state_user
+) {
     /**
      * Функция изменения статуса готовности игрока
      * user_id - id пользователя (авторизованной в системе)
@@ -145,7 +147,7 @@ function set_state_user_ready(user_id, csrf_token, is_ready,url_update_state_use
 }
 
 /* Раз в 5 секунд опрашивать сервер на изменение статуса игрока в комнате */
-function update_user_info(user_id, csrf_token,url_get_state_user) {
+function update_user_info(user_id, csrf_token, url_get_state_user) {
     /**
      * Функция обновления информации о пользователе
      * user_id - id пользователя (авторизованной в системе)

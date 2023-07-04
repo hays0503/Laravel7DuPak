@@ -80,6 +80,6 @@ class GameChatController extends Controller
      */
     public function destroy(GameChat $gameChat)
     {
-        //
+        
     }
 }

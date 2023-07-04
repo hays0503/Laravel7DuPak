@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Games;
+use App\GameChat;
 use App\Room;
 use App\User;
-use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
 use App\RoomUser;
 
@@ -107,6 +107,10 @@ class RoomController extends Controller
     public function destroy($id)
     {
         $room = Room::findOrFail($id);
+
+        // Удалить связанные записи(сообщение пользователей) в таблице game_chat
+        GameChat::deleteAllMessageInRoom($room->id);
+
         $room->users()->detach();
         $room->games()->delete(); // Удалить связанные записи в таблице "games"
         $room->delete(); // Удалить комнату
@@ -131,6 +135,16 @@ class RoomController extends Controller
 
         // Связываем комнату с пользователями
         $room->users()->sync($request->input('users'));
+        // Создаем новую игру
+        // Заполнение таких данных как 
+        // Id комнаты
+        // Id пользователя создавшего комнату
+        // Data лог хода игры резервируем пока пустым        
+        $Games = new Games();
+        // Создаем новую игру
+        //null т.к нет еще победителя
+        $Games->create("Начало игры;", null, auth()->user()->id, $room->id);
+
 
         // Перенаправляем на страницу со списком комнат и выводим сообщение
         return redirect()->route('rooms')->with('success', 'Комната успешно создана.');

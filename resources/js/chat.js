@@ -113,9 +113,6 @@ function update_chat_history(userjson, url_get_messages) {
                     let messages = document.getElementById("chat-history");
 
                     messages.append(messageBlock);
-
-                    /* Добавляем скролл в самый низ */
-                    messages.scrollTop = messages.scrollHeight;
                 });
             }
         },

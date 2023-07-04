@@ -60,9 +60,10 @@ class RoomUser extends Model
     {
         // Найти всех пользователей по id игры
         // (и полную информацию по ним)
-        $users = User::join('room_user', 'users.id', '=', 'room_user.user_id')
+        // Select * from users join room_user on users.id = room_user.user_id where room_user.game_id = $game_id
+        $usersInRoom = RoomUser::join('users', 'users.id', '=', 'room_user.user_id')
             ->where('room_user.game_id', $game_id)
             ->get();
-        return $users;
+        return $usersInRoom;
     }
 }

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'login');
 
 Route::name('user.')->group(function () {
-    Route::view('/private', 'private')->middleware('auth')->name('private');
+    Route::view('/private', 'welcome')->middleware('auth')->name('private');
 
     Route::get('/login', 'AuthController@showLoginForm')->name('login');
     Route::post('/login', 'AuthController@login');
@@ -50,8 +50,3 @@ Route::get('/rooms/room/{id}/gameRoom/', 'GameController@GameRoom')->name('GameR
 
 Route::post('/chat/{id}/send-message', 'ChatController@sendMessage')->name('chat.send-message');
 Route::get('/chat/{id}/get-messages', 'ChatController@getMessages')->name('chat.get-messages');
-
-
-Route::get('/game', function () {
-    return view('welcome');
-});

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class GameChat extends Model
 {
@@ -40,6 +41,12 @@ class GameChat extends Model
     public function messageInRoom($room_id)
     {
         return $this->where('room_id', $room_id)->get();
+    }
+
+    //Удалить все сообщения в комнате
+    static public function deleteAllMessageInRoom($room_id)
+    {
+        return DB::table('game_chats')->where('room_id', $room_id)->delete();
     }
     
 

@@ -6,20 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Games extends Model
 {
-    protected $fillable = ['name'];
 
-
-    public function create($winner_id,$creator_id,$room_id)
+    public function create($data, $winner_id, $creator_id, $room_id)
     {
-        $game = $this->create(
-            ['data' => now()],
-            ['winner_id' => $winner_id],
-            ['creator_id' => $creator_id],
-            ['room_id' => $room_id]
-        );
-        // Дополнительная логика создания игры
+        $this->data = $data;
+        $this->winner_id = $winner_id;
+        $this->creator_id = $creator_id;
+        $this->room_id = $room_id;
+        $this->save();
 
-        return $game;
+        return $this->id;
     }
 
     public function deleteGame($id)

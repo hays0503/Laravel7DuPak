@@ -30,8 +30,8 @@
                     <div class="text-primary">{{ Auth::user()->email ?? '' }}</div>
                 @endauth
                 @guest
-                    <a href="{{ route('user.registration') }}" class="ml-1 btn btn-primary">Зарегистрироваться</a>
-                    <a href="{{ route('user.login') }}" class="ml-1 btn btn-primary">Войти</a>
+                    <a href="{{ route('user.registration') }}" class="ml-1 btn btn-primary">Форма регистрации</a>
+                    <a href="{{ route('user.login') }}" class="ml-1 btn btn-primary">Форма ввторизации</a>
                 @endguest
                 @auth
                     <a href="{{ route('user.logout') }}" class="ml-1 btn btn-danger">Выйти</a>
