@@ -17,8 +17,10 @@ class RoomController extends Controller
         $rooms = Room::all();
         $users = User::all();
         $lastRoomId = Room::max('id');
+        $games = Games::all();
+        $games_can_edit = Games::where('creator_id', auth()->user()->id)->get();
 
-        return view('rooms', compact('rooms', 'users', 'lastRoomId'));
+        return view('rooms', compact('rooms', 'users', 'lastRoomId','games', 'games_can_edit'));
     }
 
     //Комната по id
@@ -96,6 +98,16 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
 
+        //Проверяем кто создавал комнату для игры
+        //Если не текущий пользователь, то редиректим на страницу со списком комнат
+        //И выводим сообщение об ошибке
+
+        if (!Games::isCreatorGameRoom(auth()->user()->id, $room->id)) {
+            return redirect(route('rooms'))->withErrors([
+                'access-denied-in-room' => 'Нет доступа к комнате',
+            ]);
+        }
+
         $room->name = $request->input('name');
         $room->save();
 
@@ -107,6 +119,16 @@ class RoomController extends Controller
     public function destroy($id)
     {
         $room = Room::findOrFail($id);
+
+        //Проверяем кто создавал комнату для игры
+        //Если не текущий пользователь, то редиректим на страницу со списком комнат
+        //И выводим сообщение об ошибке
+
+        if (!Games::isCreatorGameRoom(auth()->user()->id, $room->id)) {
+            return redirect(route('rooms'))->withErrors([
+                'access-denied-in-room' => 'Нет доступа к комнате',
+            ]);
+        }
 
         // Удалить связанные записи(сообщение пользователей) в таблице game_chat
         GameChat::deleteAllMessageInRoom($room->id);

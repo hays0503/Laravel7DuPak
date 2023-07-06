@@ -1,3 +1,9 @@
+@php
+    $usersArray = json_decode($users, true);
+    $usersNames = array_column($usersArray, 'name');
+@endphp
+
+
 <!DOCTYPE html>
 <html lang="en">
 @include('header')
@@ -113,18 +119,36 @@
                                     @endforeach
                                 </td>
                                 <td>{{ $room->create_data }}</td>
-                                <td>
-                                    <button class="btn btn-warning edit-room-btn" data-toggle="modal"
-                                        data-target="#editRoomModal" data-room-id="{{ $room->id }}"
-                                        data-room-name="{{ $room->name }}">Изменить</button>
+                                {{-- Только создатель может редактировать и удалять --}}
+                                @php
+                                    $games_can_edit_array = json_decode($games_can_edit, true);
+                                    $games_array = json_decode($games, true);
+                                @endphp
 
-                                    <form action="{{ route('rooms.destroy', ['id' => $room->id]) }}" method="POST"
-                                        class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Удалить</button>
-                                    </form>
-                                </td>
+                                @if (in_array($room->id, array_column($games_can_edit_array, 'room_id')))
+                                    <td>
+                                        <button class="btn btn-warning edit-room-btn" data-toggle="modal"
+                                            data-target="#editRoomModal" data-room-id="{{ $room->id }}"
+                                            data-room-name="{{ $room->name }}">Изменить</button>
+
+                                        <form action="{{ route('rooms.destroy', ['id' => $room->id]) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">Удалить</button>
+                                        </form>
+                                    </td>
+                                @else
+                                    {{-- Проверяем, есть ли создатель комнаты --}}
+                                    @if (in_array($room->id, array_column($games_array, 'room_id')))
+                                        @php
+                                            $creatorIndex = array_search($room->id, array_column($games_array, 'room_id'));
+                                            $creatorId = $games_array[$creatorIndex]['creator_id'];
+                                            $creatorName = isset($usersNames[$creatorId - 1]) ? $usersNames[$creatorId - 1] : '';
+                                        @endphp
+                                        <td>Создатель комнаты: {{ $creatorName }}</td>
+                                    @endif
+                                @endif
                             </tr>
                         @endforeach
 

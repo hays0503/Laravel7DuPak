@@ -18,6 +18,22 @@ class Games extends Model
         return $this->id;
     }
 
+    static public function getGameByRoomId($id)
+    {
+        return self::where('room_id', $id)->first();
+    }
+
+    //Является ли пользователь создателем игры(атрибут creator_id и room_id)
+    static public function isCreatorGameRoom($id_user, $id_room)
+    {
+        $game = self::getGameByRoomId($id_room);
+        if ($game->creator_id == $id_user) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function deleteGame($id)
     {
         $game = $this->findOrFail($id);
