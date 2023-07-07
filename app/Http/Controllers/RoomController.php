@@ -20,7 +20,7 @@ class RoomController extends Controller
         $games = Games::all();
         $games_can_edit = Games::where('creator_id', auth()->user()->id)->get();
 
-        return view('rooms', compact('rooms', 'users', 'lastRoomId','games', 'games_can_edit'));
+        return view('rooms', compact('rooms', 'users', 'lastRoomId', 'games', 'games_can_edit'));
     }
 
     //Комната по id
@@ -84,10 +84,26 @@ class RoomController extends Controller
                 'success' => false
             ], 403);
         } else {
-            return response()->json([
-                'success' => true,
-                'user_in_room' => $roomsUser
-            ], 200);
+            //Проверем состояние всех пользователей в комнате
+            // Если все готовы, то перенаправляем на страницу игры
+            // SELECT is_ready
+            // FROM public.room_user
+            // WHERE game_id = 5 and is_ready = false limit 1;
+            $isReady = RoomUser::where('game_id', $roomId)->where('is_ready', false)->limit(1)->get();
+            if ($isReady->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'user_in_room' => $roomsUser,
+                    'redirect' => true,
+                    'redirect_url' => route('GameRoom', ['id' => $roomId])
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'user_in_room' => $roomsUser,
+                    'redirect' => false
+                ], 200);
+            }
         }
     }
 

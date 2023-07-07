@@ -122,6 +122,48 @@ function update_chat_history(userjson, url_get_messages) {
     });
 }
 
+function update_user(data) {
+    console.log("Пользователи и их статусы", data);
+    /* Запрос успешен меняем статус всех пользователей  */
+    if (data.success) {
+        if (data.redirect) {
+            // Перенаправляем на страницу игры
+            window.location.href = data.redirect_url;
+        }
+
+        user_in_room = data.user_in_room;
+        user_in_room.forEach((element) => {
+            let user = document.getElementById("userid-" + element.user_id);
+            let is_ready = user.querySelector("#is_ready");
+            if (element.is_ready) {
+                is_ready.innerHTML = ` Готовность:
+                                            <span style="color:rgb(0, 255, 0)">
+                                                Готов &nbsp;
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z" />
+                                                    <path
+                                                        d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z" />
+                                                </svg>
+                                            </span>
+                                        `;
+            } else {
+                is_ready.innerHTML = ` Готовность:
+                                            <span style="color:rgb(217, 255, 0)">
+                                                Не готов &nbsp;
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                                                    <path class="colorChangeTimerSVG"
+                                                        d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                                    <path class="colorChangeTimerSVG"
+                                                        d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
+                                                </svg>
+                                            </span>
+                                        `;
+            }
+        });
+    }
+}
+
 /* Обработка изменения статуса готовности игрока */
 function set_state_user_ready(
     user_id,
@@ -143,6 +185,9 @@ function set_state_user_ready(
             user_id: user_id,
             is_ready: is_ready,
         },
+        success: function (data) {
+            update_user(data);
+        }
     });
 }
 
@@ -162,38 +207,7 @@ function update_user_info(user_id, csrf_token, url_get_state_user) {
             user_id: user_id,
         },
         success: function (data) {
-            console.log("Пользователи и их статусы", data);
-            /* Запрос успешен меняем статус всех пользователей  */
-            user_in_room = data.user_in_room;
-            user_in_room.forEach((element) => {
-                let user = document.getElementById("userid-" + element.user_id);
-                let is_ready = user.querySelector("#is_ready");
-                if (element.is_ready) {
-                    is_ready.innerHTML = ` Готовность:
-                                            <span style="color:rgb(0, 255, 0)">
-                                                Готов &nbsp;
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
-                                                    <path
-                                                        d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z" />
-                                                    <path
-                                                        d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z" />
-                                                </svg>
-                                            </span>
-                                        `;
-                } else {
-                    is_ready.innerHTML = ` Готовность:
-                                            <span style="color:rgb(217, 255, 0)">
-                                                Не готов &nbsp;
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                                                    <path class="colorChangeTimerSVG"
-                                                        d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-                                                    <path class="colorChangeTimerSVG"
-                                                        d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-                                                </svg>
-                                            </span>
-                                        `;
-                }
-            });
+            update_user(data);
         },
     });
 }

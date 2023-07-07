@@ -5,7 +5,7 @@
 
 <body class="antialiased">
     <div class="container text-center MainWidget">
-        <h1 class="align-self-center">Страницы авторизации</h1>
+        <h1 class="align-self-center">Страница авторизации</h1>
         <div class="">
             <form class="bg-primary col-3 offset-4 border rounded" method="POST" action="{{ route('user.login') }}">
                 @csrf

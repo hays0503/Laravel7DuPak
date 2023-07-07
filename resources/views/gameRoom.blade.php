@@ -6,65 +6,41 @@
 <html lang="en">
 {{-- Импортивуем стандартную шапку с панелью польхователя(логин/регистрация) --}}
 @include('header')
+<link rel="stylesheet" type="text/css" src="{{ asset('css/base.css') }}" />
+<script>
+    document.documentElement.className = "js";
+    var supportsCssVars = function() {
+        var e, t = document.createElement("style");
+        return t.innerHTML = "root: { --tmp-var: bold; }", document.head.appendChild(t), e = !!(window.CSS && window
+                .CSS.supports && window.CSS.supports("font-weight", "var(--tmp-var)")), t.parentNode.removeChild(t),
+            e
+    };
+    supportsCssVars() || alert("Please view this demo in a modern browser that supports CSS Variables.");
+</script>
+<script type="module" src="{{ asset('js/gamedice.js') }}" defer></script>
 
 <body>
-    {{-- Здесь будет всплывающее окно с затемнением в котором будет отображенно информация --}}
-    {{-- кто нажал на кнопку готов начать игру или еще не готов а так же есть чат --}}
-    {{-- после того как все участники нажали на готово игра начинается --}}
-
-    {{-- Кнопка для тестового вызова модального окна в дальнейшем будет убрана --}}
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Large
-        modal</button>
-    {{-- Модальное окно (окно ожидание пользователей) --}}
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-
-                {{-- Слева будет перечень игроков которые находятся в комнате --}}
-                {{-- Справа  будет находится чат --}}
-                {{-- Чат состоит из двух компонентов свехку история сообщений снизу строка ввода сообщения --}}
-                {{-- Когда игрок набирает сообщение рядом с его именем будет появляться надпись "Пишет..." --}}
-                {{-- Когда игрок нажимает на кнопку готов рядом с его именем появлятся зелёная галочка и надпись готов --}}
-
-                <div class="container">
-                    <div class="row">
-                        
-                            {{-- Список игроков --}}
-                            <div class="col-2">
-                                <div class="user-in-coom">
-                                    @foreach (users as user)
-                                        <div class="user-in-coom-item">
-                                            <div class="user-in-coom-item-name">
-                                                {{ $user->name }}
-                                            </div>
-                                            <div class="user-in-coom-item-status">
-                                                {{-- Проверка на то что игрок готов --}}
-                                                @if (user->ready == true)
-                                                    <div class="user-in-coom-item-status-ready">
-                                                        <i class="fa fa-check-circle" aria-hidden="true"></i>
-                                                        Готов
-                                                    </div>
-                                                @else
-                                                    <div class="user-in-coom-item-status-not-ready">
-                                                        <i class="fa fa-circle-o-notch" aria-hidden="true"></i>
-                                                        Не готов
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
+    {{-- Анимация борска костей а потом вывод информации кто выиграл --}}
+    {{-- Анимация сделанна с помощью css  --}}
+    {{-- Скрипт который выбирает кто выиграл использует Генератор случайных цифр --}}
+    <main>
+        <div class="content">
+            <canvas id="canvas"></canvas>
+            <div class="ui-controls">
+                <div class="score">На сколько ты удачен: <span id="score-result"></span></div>
+                <button id="roll-btn"> Бросаем кости </button>
             </div>
         </div>
-
+    </main>
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.138.0/examples/jsm/"
+        }
+      }
+    </script>
 </body>
 
 </html>
