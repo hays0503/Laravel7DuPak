@@ -19,11 +19,14 @@ class Games extends Migration
             $table->unsignedBigInteger('room_id');
             $table->unsignedBigInteger('creator_id');
             $table->unsignedBigInteger('winner_id')->nullable();
+            $table->unsignedBigInteger('current_user_action_id')->nullable();
+            $table->double('seed')->nullable();
             $table->timestamps();
 
             $table->foreign('room_id')->references('id')->on('rooms');
             $table->foreign('creator_id')->references('id')->on('users');
             $table->foreign('winner_id')->references('id')->on('users');
+            $table->foreign('current_user_action_id')->references('id')->on('users');
         });
     }
 

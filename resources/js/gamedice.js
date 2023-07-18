@@ -1,14 +1,27 @@
 import * as CANNON from "https://cdn.skypack.dev/cannon-es";
-import { set } from "lodash";
 
 import * as THREE from "three";
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
+import {
+    CSS3DRenderer,
+    CSS3DObject,
+} from "three/addons/renderers/CSS3DRenderer.js";
 
 const canvasEl = document.querySelector("#canvas");
 const scoreResult = document.querySelector("#score-result");
 const rollBtn = document.querySelector("#roll-btn");
+rollBtn.disabled = true;
 
-let renderer, scene, camera, diceMesh, physicsWorld;
+let webGLRenderer, css3DRenderer, scene, camera, diceMesh, physicsWorld;
+let TableResultText, HelpMsg;
+let tableBody; // Глобальная переменная для хранения ссылки на тело таблицы
+let JsonResult = [
+    { id: 1, name: "Иван", score: 0 },
+    { id: 2, name: "Петр", score: 0 },
+    { id: 3, name: "Сергей", score: 0 },
+];
+let UserIterator = 0;
+let UserSeed = 0;
 
 const params = {
     numberOfDice: 2,
@@ -20,21 +33,123 @@ const params = {
 
 const diceArray = [];
 
-initPhysics();
-initScene();
-
 window.addEventListener("resize", updateSceneSize);
-window.addEventListener("dblclick", throwDice);
-rollBtn.addEventListener("click", throwDice);
+rollBtn.addEventListener("click", () => {
+    console.log("dblclick");
+    sendSeed(window.location.href + "/UpdateCurrentUserAction", UserSeed);
+    initPhysics();
+    initScene();
+    throwDice(UserSeed);
+});
 
+export function updateScene(url) {
+    $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+            console.log("updateScene", data);
+            if (data == null) return;
+
+            if (data.current_user == data.current_user_action_id) {
+                rollBtn.disabled = false;
+                UserSeed = data.seed;
+            } else {
+                rollBtn.disabled = true;
+            }
+        },
+    });
+}
+
+function sendSeed(csrf_token, url, seed) {
+    // $.ajax({
+    //     url: url,
+    //     type: "POST",
+    //     dataType: "json",
+    //     data: {
+    //         _token: csrf_token,
+    //         seed: seed,
+    //     },
+    //     success: function (data) {
+    console.log("sendSeed", data);
+    //     },
+    // });
+}
+
+setInterval(() => {
+    const url = window.location.href + "/GetCurrentUserAction";
+    updateScene(url);
+}, 3000);
+
+function createHelp() {
+    let element = document.createElement("div");
+    let h4 = document.createElement("h4");
+    h4.style.width = "100%";
+    h4.style.height = "100%";
+    h4.style.border = "1px solid black";
+    h4.style.color = "white";
+    h4.style.fontFamily = "Arial, sans-serif";
+    h4.style.textAlign = "center";
+
+    h4.innerHTML = `Игра в костяшки <br> Набери 100 очков для победы!`;
+
+    element.appendChild(h4);
+    element.style.backgroundColor =
+        "rgba(0,127,127," + (Math.random() * 0.5 + 0.25) + ")";
+    let objectCSS = new CSS3DObject(element);
+    objectCSS.scale.set(0.05, 0.05, 0.05);
+
+    return objectCSS;
+}
+
+function createTableScore() {
+    let element = document.createElement("div");
+    let table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.height = "100%";
+    table.style.border = "1px solid black";
+    table.style.color = "white";
+    table.style.fontFamily = "Arial, sans-serif";
+    table.style.textAlign = "center";
+
+    table.innerHTML = `<tr>
+        <th style="padding: 8px; background-color: #333;">id</th>
+        <th style="padding: 8px; background-color: #333;">Имя</th>
+        <th style="padding: 8px; background-color: #333;">Счет</th>
+    </tr>`;
+
+    // Создать ссылку на тело таблицы
+    tableBody = table.createTBody();
+
+    JsonResult.forEach((UserScore) => {
+        let row = tableBody.insertRow();
+        row.insertCell().textContent = UserScore.id;
+        row.insertCell().textContent = UserScore.name;
+        row.insertCell().textContent = UserScore.score;
+    });
+
+    element.appendChild(table);
+    element.style.backgroundColor =
+        "rgba(0,127,127," + (Math.random() * 0.5 + 0.25) + ")";
+    let objectCSS = new CSS3DObject(element);
+    objectCSS.scale.set(0.05, 0.05, 0.05);
+
+    return objectCSS;
+}
 function initScene() {
-    renderer = new THREE.WebGLRenderer({
+    webGLRenderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: true,
         canvas: canvasEl,
     });
-    renderer.shadowMap.enabled = true;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    webGLRenderer.shadowMap.enabled = true;
+    webGLRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    css3DRenderer = new CSS3DRenderer();
+    css3DRenderer.setSize(window.innerWidth, window.innerHeight);
+    css3DRenderer.domElement.style.position = "absolute";
+    css3DRenderer.domElement.style.top = "0";
+    document.body.appendChild(css3DRenderer.domElement);
 
     scene = new THREE.Scene();
 
@@ -44,7 +159,7 @@ function initScene() {
         0.1,
         300
     );
-    camera.position.set(0, 1, 0).multiplyScalar(1);
+    camera.position.set(0, 7, 11).multiplyScalar(3);
     camera.lookAt(0, 0, 0);
 
     updateSceneSize();
@@ -69,7 +184,15 @@ function initScene() {
         addDiceEvents(diceArray[i]);
     }
 
-    throwDice();
+    // throwDice();
+
+    TableResultText = createTableScore();
+    TableResultText.position.set(0, 1, -1);
+    scene.add(TableResultText);
+
+    HelpMsg = createHelp();
+    HelpMsg.position.set(0, 3, -5);
+    scene.add(HelpMsg);
 
     render();
 }
@@ -330,15 +453,28 @@ function showRollResults(score) {
         scoreResult.innerHTML += score;
     } else {
         const score_all = parseInt(scoreResult.innerHTML) + score;
-        scoreResult.innerHTML +=
-            "+" + score + "=" + (parseInt(scoreResult.innerHTML) + score);
-        if (score_all >= 5) {
+
+        scoreResult.innerHTML = score_all;
+        JsonResult[UserIterator].score += score_all;
+        if (score_all >= 12) {
             scoreResult.innerHTML = "Вы получаете немного фансервиса! =)";
-            setTimeout(() => {
-                window.location.href = ENV.APP_URL + "/public/mmd/index.html";
-            }, 5000);
+            // Показать кнопку
+            document.querySelector("#show-secrets").style.display = "block";
+        }
+        // Переключить пользователя
+        if (UserIterator < JsonResult.length - 1) {
+            UserIterator++;
+        } else {
+            UserIterator = 0;
         }
     }
+
+    // Обновить все данные
+    let index = 0;
+    JsonResult.forEach((row) => {
+        tableBody.rows[index].cells[2].textContent = row.score;
+        index++;
+    });
 }
 
 function render() {
@@ -352,17 +488,20 @@ function render() {
     const dice1Position = diceArray[0].body.position.clone();
     const dice2Position = diceArray[1].body.position.clone();
 
-    const centerPosition = new THREE.Vector3()
+    const centerPositionDice = new THREE.Vector3()
         .addVectors(dice1Position, dice2Position)
         .multiplyScalar(0.5);
 
-    const distance = dice1Position.distanceTo(dice2Position);
-    const cameraOffset = new THREE.Vector3(0, distance, distance); // Смещение камеры относительно центра
+    const distanceDice = dice1Position.distanceTo(dice2Position);
+    const cameraOffsetDice = new THREE.Vector3(0, distanceDice, distanceDice);
 
-    camera.position.copy(centerPosition).add(cameraOffset); // Установка позиции камеры
-    camera.lookAt(centerPosition); // Взгляд на центр камеры
+    // camera.position.copy(centerPositionDice).add(cameraOffsetDice);
+    camera.position.set(0, 5, 7).multiplyScalar(4);
+    camera.lookAt(centerPositionDice);
 
-    renderer.render(scene, camera);
+    webGLRenderer.render(scene, camera);
+    css3DRenderer.render(scene, camera);
+
     requestAnimationFrame(render);
 }
 
@@ -371,10 +510,13 @@ function updateSceneSize() {
     const scale = 0.8;
     camera.aspect = window.innerWidth / (window.innerHeight * scale);
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight * scale);
+    webGLRenderer.setSize(window.innerWidth, window.innerHeight * scale);
+    css3DRenderer.setSize(
+        window.innerWidth - 0.4,
+        window.innerHeight * scale - 0.4
+    );
 }
-
-function throwDice() {
+function throwDice(RandomMatch) {
     scoreResult.innerHTML = "";
 
     diceArray.forEach((d, dIdx) => {
@@ -384,14 +526,27 @@ function throwDice() {
         d.body.position = new CANNON.Vec3(6, dIdx * 1.5, 0);
         d.mesh.position.copy(d.body.position);
 
-        d.mesh.rotation.set(
-            2 * Math.PI * Math.random(),
-            0,
-            2 * Math.PI * Math.random()
+        // const MRandom1 = Math.random();
+        // const MRandom2 = Math.random();
+        // const MRandom3 = Math.random();
+
+        const MRandom1 = +RandomMatch;
+        const MRandom2 = MRandom1 + 0.01;
+        const MRandom3 = MRandom2 + 0.01;
+
+        console.log(
+            "MRandom1=",
+            MRandom1,
+            "MRandom2=",
+            MRandom2,
+            "MRandom3=",
+            MRandom3
         );
+
+        d.mesh.rotation.set(2 * Math.PI * MRandom1, 0, 2 * Math.PI * MRandom2);
         d.body.quaternion.copy(d.mesh.quaternion);
 
-        const force = 3 + 5 * Math.random();
+        const force = 3 + 5 * MRandom3;
         d.body.applyImpulse(
             new CANNON.Vec3(-force, force, 0),
             new CANNON.Vec3(0, 0, 0.2)

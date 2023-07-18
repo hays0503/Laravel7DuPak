@@ -47,6 +47,8 @@ Route::post('/rooms/room/{id}/update-state-user', 'RoomController@updateStateUse
 Route::get('/rooms/room/{id}/get-state-user', 'RoomController@getStateUser')->name('rooms.get-state-user');
 
 Route::get('/rooms/room/{id}/gameRoom/', 'GameController@GameRoom')->name('GameRoom');
+Route::get('/rooms/room/{id}/gameRoom/GetCurrentUserAction', 'GameController@GetCurrentUserAction')->name('GameRoom.GetCurrentUserAction');
+Route::post('/rooms/room/{id}/gameRoom/UpdateCurrentUserAction', 'GameController@UpdateCurrentUserAction')->name('GameRoom.UpdateCurrentUserAction');
 
 Route::post('/chat/{id}/send-message', 'ChatController@sendMessage')->name('chat.send-message');
 Route::get('/chat/{id}/get-messages', 'ChatController@getMessages')->name('chat.get-messages');

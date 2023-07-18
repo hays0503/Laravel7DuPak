@@ -13,6 +13,8 @@ class Games extends Model
         $this->winner_id = $winner_id;
         $this->creator_id = $creator_id;
         $this->room_id = $room_id;
+        $this->current_user_action_id = $creator_id;
+        $this->seed = 0;
         $this->save();
 
         return $this->id;
@@ -32,6 +34,14 @@ class Games extends Model
         } else {
             return false;
         }
+    }
+
+    //Обновить текущего пользователя
+    static public function updateCurrentUserActionId($room_id,$current_user_action_id)
+    {
+        $game = self::getGameByRoomId($room_id);
+        $game->current_user_action_id = $current_user_action_id;
+        $game->save();
     }
 
     public function deleteGame($id)

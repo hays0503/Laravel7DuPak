@@ -17,7 +17,7 @@ class RoomUser extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('game_id')->constrained('rooms', 'id');
             $table->boolean('is_ready')->default(false);
-            // $table->unsignedBigInteger('room_id')->nullable();
+            $table->unsignedBigInteger('score')->nullable();
         });
     }
 
