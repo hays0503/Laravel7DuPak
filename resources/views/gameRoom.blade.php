@@ -39,7 +39,7 @@
     let TableResultText, HelpMsg;
     let tableBody; // Глобальная переменная для хранения ссылки на тело таблицы
     //Сюда будем записывать результаты реальные имена людей из комнаты
-    
+
     let JsonResult = [
         { id: 1, name: "Иван", score: 0 },
         { id: 2, name: "Петр", score: 0 },
@@ -573,11 +573,11 @@
             d.body.position = new CANNON.Vec3(6, dIdx * 1.5, 0);
             d.mesh.position.copy(d.body.position);
 
-            // const MRandom1 = Math.random();
+            const MRandom1 = Math.random();
             // const MRandom2 = Math.random();
             // const MRandom3 = Math.random();
 
-            const MRandom1 = +RandomMatch;
+            // const MRandom1 = +RandomMatch;
             const MRandom2 = MRandom1 + 0.01;
             const MRandom3 = MRandom2 + 0.01;
 
